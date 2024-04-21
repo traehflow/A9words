@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Found words count: 775
  */
-public class A9Words {
+public class A9WordsSimple {
 
     public static final int WORD_LENGTH = 9;
 
@@ -16,6 +16,7 @@ public class A9Words {
         long start = System.currentTimeMillis();
         String urlAddress = "https://raw.githubusercontent.com/nikiiv/JavaCodingTestOne/master/scrabble-words.txt"; // Change this to the URL of your text file
         Map<Integer, Set<String>> wordsBySize = new HashMap<>();
+        Set<String> allWords = new HashSet<>();
 
         /**
          * Cache for all words, each of them is pointing to a 1-character less word,
@@ -41,48 +42,24 @@ public class A9Words {
         while ((line = reader.readLine()) != null) {
             int l = line.length();
             if (l <= WORD_LENGTH) {
+                allWords.add(line);
                 wordsBySize.computeIfAbsent(l, x -> new HashSet<>()).add(line);
             }
         }
         reader.close();
+        long startAfterLoading = System.currentTimeMillis();
 
+        allWords.add("A");
+        allWords.add("I");
         wordsBySize.computeIfAbsent(1, x -> new HashSet<>()).add("I");
         wordsBySize.get(1).add("A");
 
-        long startAfterLoading = System.currentTimeMillis();
-        //Compare line to line and remove redundant words
-        for (int i = WORD_LENGTH; i > 2; --i) {
-            final int upper = i - 1;
-            Set<String> upperCache = new HashSet<>();
-            Set<String> cache = new HashSet<>();
-            for( String x : wordsBySize.get(i)) {
-                for ( String y  : A9WordsUtil.cutWords(x)) {
-                    if (wordsBySize.get(i - 1).contains(y)) {
-                        cache.add(x);
-                        upperCache.add(y);
-                    }
+        for(String word : allWords) {
+            for(String cutWord : A9WordsUtil.cutWords(word)) {
+                if(allWords.contains(cutWord)) {
+                    linksCache.computeIfAbsent(word, z -> new HashSet<>()).add(cutWord);
                 }
             }
-            wordsBySize.put(i, cache);
-            wordsBySize.put(upper, upperCache);
-        }
-
-
-        //Without this: Word links buffer count: 31532
-        //With this: Word links buffer count: 4340
-
-        for (int i = 2; i <= WORD_LENGTH; ++i) {
-            final int upper = i - 1;
-            HashSet<String> cache = new HashSet<>();
-            for( String x : wordsBySize.get(i)) {
-                for( String y : A9WordsUtil.cutWords(x)) {
-                    if (wordsBySize.get(upper).contains(y)) {
-                        cache.add(x);
-                        linksCache.computeIfAbsent(x, z -> new HashSet<>()).add(y);
-                    }
-                }
-            }
-            wordsBySize.put(i, cache);
         }
 
         HashSet<String> wordsByReturn = new HashSet<>();
@@ -106,6 +83,5 @@ public class A9Words {
         System.out.println("Time elapsed (links calc): " + (end - starLinks));
 
     }
-
 
 }
