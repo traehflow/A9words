@@ -27,3 +27,10 @@ Why Set<String>? Because by eating out one char can be produced more than one wo
          -    CRAP -> CAP, CRAP -> RAP
 
         
+
+Sample execution time of A9Words.java
+Word links buffer count: 4340
+Found words count: 775
+Time elapsed (with loading data from the link): 857 ms
+Time elapsed (startAfterLoading): 166 ms
+Time elapsed (links calc): 10 ms
